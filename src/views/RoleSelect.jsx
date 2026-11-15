@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useTelemetry } from "../state/TelemetryContext";
 import { LABELS, IMAGES, STATUS_ORDER, STATUS_STYLE } from "../config";
+import Skeleton from "../components/Skeleton";
 
 function ArrowIcon() {
   return (
@@ -10,130 +11,164 @@ function ArrowIcon() {
   );
 }
 
+// NASA meatball-style roundel: brand moment, used sparingly.
+function Roundel() {
+  return (
+    <span className="w-8 h-8 rounded-full bg-nasa-blue border border-edge flex items-center justify-center shrink-0 shadow-panel">
+      <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" fill="none" stroke="#FC3D21" strokeWidth="1.4" />
+        <path d="M5 15.5C8 13 16 13 19 15.5" stroke="#FC3D21" strokeWidth="1.4" fill="none" />
+        <path d="M7 10l4 3-4 3z" fill="#FC3D21" />
+      </svg>
+    </span>
+  );
+}
+
 export default function RoleSelect() {
   const navigate = useNavigate();
   const { earthMode, apod, crew, backendKind } = useTelemetry();
   const labels = earthMode ? LABELS.earth : LABELS.space;
   const firstCrewId = crew[0] ? crew[0].crew_id : "first";
+  const loading = crew.length === 0;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
 
-      {/* Hero */}
-      <div className="relative rounded-3xl overflow-hidden border border-cabin-700 mb-10">
-        <img
-          src={IMAGES.earthHorizon}
-          alt="Earth observed from the International Space Station"
-          className="w-full h-64 sm:h-80 object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-cabin-900 via-cabin-900/60 to-transparent" />
-        <div className="absolute bottom-0 inset-x-0 p-6 sm:p-8">
-          <div className="text-[11px] uppercase tracking-[0.2em] text-ok mb-2 font-mono">
+      {/* Hero: arrive, do not flash */}
+      <div className="anim-fade-up">
+        <div className="flex items-center gap-3 mb-5">
+          <span className="h-[2px] w-10 bg-nasa-blue" aria-hidden="true" />
+          <span className="text-[10px] font-mono tracking-[0.24em] text-ink-muted uppercase">
             NASA Space Apps Challenge 2026
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-50 max-w-xl leading-tight">
-            Continuous health watch for crews far from help
-          </h1>
-          <p className="mt-2 text-sm sm:text-base text-slate-300 max-w-xl">
-            Vitals stream in live. Status is classified in plain language. Warnings reach a
-            named responder with exact next steps, and every event lands in the mission report.
-          </p>
+          </span>
         </div>
-        {backendKind === "mock" && (
-          <div className="absolute top-4 right-4 px-3 py-1.5 rounded-lg bg-danger/20 border border-danger/40 text-danger text-xs font-mono">
-            SIMULATED FEED
-          </div>
-        )}
+        <h1 className="font-display text-4xl sm:text-5xl lg:text-[56px] font-semibold text-ink leading-[1.08] max-w-3xl">
+          Continuous health watch for crews far from help.
+        </h1>
+        <p className="mt-4 text-sm sm:text-base text-ink-dim max-w-2xl leading-relaxed">
+          Vitals stream in live. Status is classified in plain language. Warnings reach a
+          named responder with exact next steps, and every event lands in the mission report.
+        </p>
       </div>
 
       {/* Role selection */}
-      <h2 className="text-xl font-semibold text-slate-100 mb-4">{labels.homeTitle}</h2>
-      <div className="grid sm:grid-cols-2 gap-4 mb-10">
+      <h2 className="anim-fade-up font-display text-lg font-semibold text-ink mt-12 mb-4" style={{ animationDelay: "60ms" }}>
+        {labels.homeTitle}
+      </h2>
+      <div className="grid sm:grid-cols-2 gap-4 sm:gap-5 mb-14">
         <button
           onClick={() => navigate(`/crew/${firstCrewId}`)}
-          className="group text-left rounded-2xl overflow-hidden bg-cabin-800 border border-cabin-700 hover:border-ok/60 transition"
+          className="anim-fade-up group text-left rounded-2xl bg-orbiter shadow-panel border border-edge/50 overflow-hidden hover:-translate-y-1 hover:shadow-lift hover:border-telemetry/40 transition-all duration-300"
+          style={{ animationDelay: "120ms" }}
         >
-          <img
-            src={IMAGES.astronaut}
-            alt="NASA astronaut on a spacewalk"
-            className="w-full h-40 object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition duration-300"
-          />
+          <div className="relative overflow-hidden">
+            <img
+              src={IMAGES.astronaut}
+              alt="NASA astronaut on a spacewalk"
+              className="w-full h-44 sm:h-48 object-cover saturate-[0.65] group-hover:saturate-100 group-hover:scale-[1.03] transition-all duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-orbiter via-transparent to-transparent" />
+          </div>
           <div className="p-5">
-            <div className="flex items-center justify-between">
-              <div className="text-lg font-semibold text-slate-100 group-hover:text-ok transition">
+            <div className="flex items-center justify-between gap-3">
+              <div className="font-display text-lg font-semibold text-ink group-hover:text-telemetry transition-colors duration-200">
                 {labels.crewCard}
               </div>
-              <span className="text-slate-500 group-hover:text-ok transition"><ArrowIcon /></span>
+              <span className="text-ink-muted group-hover:text-telemetry group-hover:translate-x-1 transition-all duration-200">
+                <ArrowIcon />
+              </span>
             </div>
-            <div className="text-sm text-slate-400 mt-1">{labels.crewCardHint}</div>
+            <div className="text-xs text-ink-dim mt-1">{labels.crewCardHint}</div>
           </div>
         </button>
 
         <button
           onClick={() => navigate("/control")}
-          className="group text-left rounded-2xl overflow-hidden bg-cabin-800 border border-cabin-700 hover:border-sky-400/60 transition"
+          className="anim-fade-up group text-left rounded-2xl bg-orbiter shadow-panel border border-edge/50 overflow-hidden hover:-translate-y-1 hover:shadow-lift hover:border-telemetry/40 transition-all duration-300"
+          style={{ animationDelay: "180ms" }}
         >
-          <img
-            src={IMAGES.missionControl}
-            alt="Flight control room at NASA Mission Control Center"
-            className="w-full h-40 object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition duration-300"
-          />
+          <div className="relative overflow-hidden">
+            <img
+              src={IMAGES.missionControl}
+              alt="Flight control room at NASA Mission Control Center"
+              className="w-full h-44 sm:h-48 object-cover saturate-[0.65] group-hover:saturate-100 group-hover:scale-[1.03] transition-all duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-orbiter via-transparent to-transparent" />
+          </div>
           <div className="p-5">
-            <div className="flex items-center justify-between">
-              <div className="text-lg font-semibold text-slate-100 group-hover:text-sky-300 transition">
+            <div className="flex items-center justify-between gap-3">
+              <div className="font-display text-lg font-semibold text-ink group-hover:text-telemetry transition-colors duration-200">
                 {labels.controlCard}
               </div>
-              <span className="text-slate-500 group-hover:text-sky-300 transition"><ArrowIcon /></span>
+              <span className="text-ink-muted group-hover:text-telemetry group-hover:translate-x-1 transition-all duration-200">
+                <ArrowIcon />
+              </span>
             </div>
-            <div className="text-sm text-slate-400 mt-1">{labels.controlCardHint}</div>
+            <div className="text-xs text-ink-dim mt-1">{labels.controlCardHint}</div>
           </div>
         </button>
       </div>
 
-      {/* Status ladder legend */}
-      <h2 className="text-xl font-semibold text-slate-100 mb-3">The four status levels</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
-        {STATUS_ORDER.map((status) => {
-          const style = STATUS_STYLE[status];
-          return (
-            <div
-              key={status}
-              className="rounded-xl border p-4"
-              style={{ backgroundColor: style.bg, borderColor: `${style.color}55` }}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ backgroundColor: style.color }} />
-                <span className="font-semibold" style={{ color: style.color }}>{style.label}</span>
-              </div>
-              <p className="text-xs text-slate-400">
-                {status === "NOMINAL" && "All vitals within the safe range."}
-                {status === "ELEVATED" && "One or more vitals trending out of range."}
-                {status === "ANOMALY" && "Significant deviation, action required."}
-                {status === "EMERGENCY" && "Immediate intervention required."}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* NASA picture of the day, served by the backend */}
-      {apod && apod.url && (
-        <div className="rounded-2xl overflow-hidden border border-cabin-700 relative">
-          <img
-            src={apod.url}
-            alt={apod.title || "NASA Astronomy Picture of the Day"}
-            className="w-full max-h-72 object-cover opacity-80"
-          />
-          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-cabin-900 to-transparent p-4">
-            <div className="text-xs text-slate-400 font-mono uppercase tracking-wider">
-              NASA Astronomy Picture of the Day
-            </div>
-            <div className="text-sm text-slate-200 font-medium">{apod.title}</div>
+      {/* Status ladder: one bar, four segments, fills left to right */}
+      <h2 className="anim-fade-up font-display text-lg font-semibold text-ink mb-4" style={{ animationDelay: "240ms" }}>
+        The four status levels
+      </h2>
+      <div className="anim-fade-up mb-14" style={{ animationDelay: "300ms" }}>
+        <div className="rounded-2xl bg-orbiter shadow-panel overflow-hidden">
+          <div className="flex anim-ladder-fill">
+            {STATUS_ORDER.map((status) => {
+              const style = STATUS_STYLE[status];
+              return (
+                <div key={status} className="flex-1 relative">
+                  <div className="h-[3px]" style={{ backgroundColor: style.bright }} />
+                  <div
+                    className="px-3 sm:px-4 py-4 sm:py-5 border-r border-edge/40 last:border-r-0"
+                    style={{ backgroundColor: style.deep }}
+                  >
+                    <div className="font-mono text-[10px] sm:text-[11px] font-semibold tracking-[0.14em]" style={{ color: style.bright }}>
+                      {style.label}
+                    </div>
+                    <p className="hidden sm:block text-[11px] text-ink-dim mt-1.5 leading-snug">
+                      {status === "NOMINAL" && "All vitals within the safe range."}
+                      {status === "ELEVATED" && "One or more vitals trending out of range."}
+                      {status === "ANOMALY" && "Significant deviation, action required."}
+                      {status === "EMERGENCY" && "Immediate intervention required."}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
+      </div>
 
-      <p className="mt-8 text-[11px] text-slate-500">
+      {/* NASA picture of the day: a quiet grace note, served by the backend */}
+      <div className="anim-fade-up mb-14" style={{ animationDelay: "360ms" }}>
+        <div className="flex items-center gap-2 mb-3">
+          <Roundel />
+          <span className="text-[10px] font-mono tracking-[0.18em] text-ink-muted uppercase">
+            NASA Astronomy Picture of the Day
+          </span>
+        </div>
+        {apod && apod.url ? (
+          <div className="rounded-2xl overflow-hidden border border-edge/50 shadow-panel">
+            <img
+              src={apod.url}
+              alt={apod.title || "NASA Astronomy Picture of the Day"}
+              className="w-full h-52 sm:h-64 object-cover"
+            />
+            {apod.title && (
+              <div className="px-4 py-3 bg-panel">
+                <span className="text-xs text-ink-dim">{apod.title}</span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Skeleton className="w-full h-52 sm:h-64" />
+        )}
+      </div>
+
+      <p className="anim-fade-up text-[11px] text-ink-muted" style={{ animationDelay: "420ms" }}>
         Simulation for the NASA Space Apps Challenge. Not medical advice.
       </p>
     </div>

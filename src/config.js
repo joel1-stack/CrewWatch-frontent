@@ -48,11 +48,13 @@ export const STATUS = {
 
 export const STATUS_ORDER = ["NOMINAL", "ELEVATED", "ANOMALY", "EMERGENCY"];
 
+// Status ladder: deep tone is the panel background, bright tone is the
+// label and stripe. The glow appears only on active or fresh alerts.
 export const STATUS_STYLE = {
-  NOMINAL: { color: "#22c55e", bg: "rgba(34,197,94,0.14)", label: "Nominal" },
-  ELEVATED: { color: "#eab308", bg: "rgba(234,179,8,0.14)", label: "Elevated" },
-  ANOMALY: { color: "#f97316", bg: "rgba(249,115,22,0.16)", label: "Anomaly" },
-  EMERGENCY: { color: "#ef4444", bg: "rgba(239,68,68,0.18)", label: "Emergency" }
+  NOMINAL:   { deep: "#06281F", bright: "#10B981", label: "NOMINAL" },
+  ELEVATED:  { deep: "#2A1F02", bright: "#FACC15", label: "ELEVATED" },
+  ANOMALY:   { deep: "#2D1100", bright: "#FB923C", label: "ANOMALY" },
+  EMERGENCY: { deep: "#2A0406", bright: "#FC3D21", label: "EMERGENCY" }
 };
 
 // Metric fields use the backend VitalsReading model names directly.

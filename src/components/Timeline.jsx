@@ -1,27 +1,58 @@
-const TYPE_COLOR = {
-  STATUS_ALERT: "text-warn",
-  ALERT_ACK: "text-ok",
-  ALERT_ESCALATED: "text-danger",
-  SCENARIO: "text-violet-300",
-  SYSTEM: "text-slate-400"
+// The audit trail: reverse-chronological, always visibly filling up.
+const LEVEL_COLOR = {
+  NOMINAL: "#10B981",
+  ELEVATED: "#FACC15",
+  ANOMALY: "#FB923C",
+  EMERGENCY: "#FC3D21"
 };
+
+function dotColor(detail) {
+  if (!detail) return "#475569";
+  for (const key of Object.keys(LEVEL_COLOR)) {
+    if (detail.includes(key)) return LEVEL_COLOR[key];
+  }
+  return "#94A3B8";
+}
 
 export default function Timeline({ logs }) {
   return (
-    <div className="rounded-xl bg-cabin-800 border border-cabin-700 p-4 max-h-[420px] overflow-y-auto">
-      <h3 className="font-semibold text-slate-100 mb-3">Event Log</h3>
-      {logs.length === 0 && <p className="text-sm text-slate-500">Waiting for events.</p>}
-      <ul className="space-y-1.5 text-xs font-mono">
-        {logs.slice(0, 60).map((log) => (
-          <li key={log.id} className="flex gap-3">
-            <span className="text-slate-500 shrink-0">
-              {new Date(log.ts).toLocaleTimeString()}
-            </span>
-            <span className={TYPE_COLOR[log.type] || "text-slate-300"}>{log.type}</span>
-            <span className="text-slate-300 truncate max-w-[80px]">{log.crew}</span>
-            <span className="text-slate-500 truncate">{log.detail || ""}</span>
-          </li>
-        ))}
+    <div className="rounded-2xl bg-orbiter shadow-panel p-4">
+      <h2 className="font-display font-semibold text-sm tracking-wide text-ink mb-3">Event Log</h2>
+      {logs.length === 0 && (
+        <div className="py-6 text-center">
+          <p className="text-xs text-ink-muted">The record is filling as events happen.</p>
+        </div>
+      )}
+      <ul className="space-y-0 max-h-[480px] overflow-y-auto pr-1">
+        {logs.slice(0, 60).map((log, i) => {
+          const color = dotColor(log.detail);
+          const isLast = i === Math.min(logs.length, 60) - 1;
+          return (
+            <li
+              key={log.id}
+              className={`relative flex gap-3 pb-3 last:pb-0 ${i === 0 ? "anim-log-arrive" : ""}`}
+            >
+              {/* Timeline spine */}
+              {!isLast && (
+                <span className="absolute left-[3.5px] top-2.5 bottom-0 w-px bg-edge/50" aria-hidden="true" />
+              )}
+              <span
+                className="relative z-10 mt-1.5 h-2 w-2 rounded-full shrink-0 border border-void"
+                style={{ backgroundColor: color }}
+                aria-hidden="true"
+              />
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span className="font-mono text-[10px] text-ink-muted tabular">
+                    {new Date(log.ts).toLocaleTimeString()}
+                  </span>
+                  <span className="text-[11px] text-ink-dim font-medium truncate">{log.crew}</span>
+                </div>
+                <p className="text-[11px] text-ink-dim leading-snug break-words">{log.detail}</p>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

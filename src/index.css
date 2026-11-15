@@ -2,20 +2,182 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------------------------------------------
+   Base
+   ------------------------------------------------------------ */
 html {
-  background-color: #0b1220;
+  background-color: #03060f;
 }
 
 body {
   margin: 0;
   -webkit-tap-highlight-color: transparent;
+  font-family: "Inter", system-ui, sans-serif;
+  color: #e6edf7;
+  font-feature-settings: "tnum" 1;
 }
 
-/* Large touch targets on phones */
 button {
   touch-action: manipulation;
 }
 
-/* Subtle scrollbar */
+/* Focus rings: 2px telemetry cyan with a 2px offset, keyboard visible. */
+:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Quiet scrollbar */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: #1a2a47; border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: #1b2845; border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Tabular numbers everywhere a value lives: no jitter as data updates. */
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------
+   Engineering surface texture (Mission Control only)
+   ------------------------------------------------------------ */
+.grid-texture {
+  background-image: radial-gradient(rgba(103, 232, 249, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* ------------------------------------------------------------
+   Motion language: slow is professional.
+   ------------------------------------------------------------ */
+
+/* Page assembly: content fades up, staggered per section. */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim-fade-up {
+  animation: fadeUp 360ms ease-out both;
+}
+
+/* Live data breathes, like a heartbeat. */
+@keyframes breathe {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+.anim-breathe {
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+/* Alert arrival: slides in, then the glow decays. */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.anim-slide-in {
+  animation: slideIn 320ms ease-out both;
+}
+
+/* Fresh alert glow: one strong pulse, then it decays. */
+@keyframes alertGlow {
+  0% { box-shadow: 0 0 0 0 rgba(252, 61, 33, 0.35); }
+  50% { box-shadow: 0 0 28px 2px rgba(252, 61, 33, 0.25); }
+  100% { box-shadow: 0 0 0 0 rgba(252, 61, 33, 0); }
+}
+.anim-alert-glow {
+  animation: alertGlow 1.2s ease-out both;
+}
+
+/* Status change: a soft radial pulse behind the new status word. */
+@keyframes statusPulse {
+  0% { box-shadow: 0 0 0 0 currentColor; opacity: 0.35; }
+  100% { box-shadow: 0 0 42px 18px currentColor; opacity: 0; }
+}
+.anim-status-pulse {
+  animation: statusPulse 1.2s ease-out both;
+}
+
+/* Value update: the number pops once instead of jumping. */
+@keyframes valuePop {
+  0% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+.anim-value-pop {
+  animation: valuePop 200ms ease-out both;
+}
+
+/* Log entry arrival: newest item slides down from the top. */
+@keyframes logArrive {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim-log-arrive {
+  animation: logArrive 280ms ease-out both;
+}
+
+/* Checkmark draw-in on acknowledge. */
+@keyframes drawCheck {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+.anim-draw-check {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: drawCheck 320ms ease-out forwards;
+}
+
+/* Skeleton shimmer for loading states: never a blank box. */
+@keyframes shimmer {
+  from { background-position: -200px 0; }
+  to { background-position: 200px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #121a30 0%, #1b2845 40%, #121a30 80%);
+  background-size: 400px 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 8px;
+}
+
+/* Ladder fill on scroll-in. */
+@keyframes ladderFill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.anim-ladder-fill {
+  transform-origin: left center;
+  animation: ladderFill 800ms ease-out both;
+}
+
+/* Screen hue shift for Earth Mode. */
+.earth-shift {
+  transition: filter 480ms ease;
+  filter: hue-rotate(30deg) saturate(1.08);
+}
+.space-shift {
+  transition: filter 480ms ease;
+  filter: none;
+}
+
+/* ------------------------------------------------------------
+   Reduced motion: respect the OS setting. All pulses and
+   slides drop to instant fades.
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-up,
+  .anim-slide-in,
+  .anim-alert-glow,
+  .anim-status-pulse,
+  .anim-value-pop,
+  .anim-log-arrive,
+  .anim-ladder-fill,
+  .anim-draw-check,
+  .skeleton {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .anim-breathe {
+    animation: none !important;
+    opacity: 0.9;
+  }
+  .earth-shift,
+  .space-shift {
+    transition: none;
+  }
+}
