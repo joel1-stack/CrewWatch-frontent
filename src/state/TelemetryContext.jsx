@@ -123,9 +123,25 @@ export function TelemetryProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
 
+    // Cold starts on serverless hosts can drop the first request. Retry the
+    // health check a few times before deciding the backend is unreachable.
+    async function waitForHealth() {
+      const attempts = 3;
+      for (let attempt = 1; attempt <= attempts; attempt++) {
+        try {
+          await LiveApi.health();
+          return true;
+        } catch (error) {
+          if (attempt === attempts) throw error;
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        }
+      }
+      return false;
+    }
+
     async function boot() {
       if (CONFIG.FORCE_DEMO) throw new Error("demo mode forced");
-      await LiveApi.health(); // throws if unreachable
+      await waitForHealth();
       if (cancelled) return;
 
       backendRef.current = {
